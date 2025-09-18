@@ -47,13 +47,20 @@
       margin-top: 10px;
       border: 1px solid #ccc;
     }
+    /* Colores de filas */
+    .ingreso {
+      background-color: #d4edda; /* verde claro */
+    }
+    .egreso {
+      background-color: #f8d7da; /* rojo claro */
+    }
   </style>
 </head>
 <body>
 
-  <h1>Transparencia Caja Chica</h1>
+  <h1>Transparencia Caja Chica "La jarana"</h1>
 
-  <table>
+  <table id="tablaCaja">
     <thead>
       <tr>
         <th>Fecha Ingreso</th>
@@ -94,6 +101,19 @@
       const img = document.getElementById(id);
       img.style.display = img.style.display === "block" ? "none" : "block";
     }
+
+    // Detectar ingresos y egresos
+    const filas = document.querySelectorAll("#tablaCaja tbody tr");
+    filas.forEach(fila => {
+      const montoIngreso = fila.cells[1].innerText.trim();
+      const montoEgreso = fila.cells[3].innerText.trim();
+
+      if (montoIngreso !== "-" && montoIngreso !== "") {
+        fila.classList.add("ingreso");
+      } else if (montoEgreso !== "-" && montoEgreso !== "") {
+        fila.classList.add("egreso");
+      }
+    });
   </script>
 
 </body>
