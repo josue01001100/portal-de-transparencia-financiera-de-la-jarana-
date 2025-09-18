@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transparencia Caja Chica - Grupo Musical</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: #fff;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background: #333;
+      color: white;
+    }
+    button {
+      padding: 5px 10px;
+      margin: 5px;
+      cursor: pointer;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    img {
+      display: none;
+      max-width: 300px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Transparencia Caja Chica</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha Ingreso</th>
+        <th>Monto Ingreso</th>
+        <th>Fecha Egreso</th>
+        <th>Monto Egreso</th>
+        <th>Comprobante</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>10/09/2025</td>
+        <td>S/ 500</td>
+        <td>-</td>
+        <td>-</td>
+        <td>
+          <button onclick="toggleImage('img1')">Ver Comprobante</button>
+          <br>
+          <img id="img1" src="https://via.placeholder.com/300" alt="Comprobante ingreso">
+        </td>
+      </tr>
+      <tr>
+        <td>-</td>
+        <td>-</td>
+        <td>12/09/2025</td>
+        <td>S/ 200</td>
+        <td>
+          <button onclick="toggleImage('img2')">Ver Comprobante</button>
+          <br>
+          <img id="img2" src="https://via.placeholder.com/300" alt="Comprobante egreso">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    function toggleImage(id) {
+      const img = document.getElementById(id);
+      img.style.display = img.style.display === "block" ? "none" : "block";
+    }
+  </script>
+
+</body>
+</html>
