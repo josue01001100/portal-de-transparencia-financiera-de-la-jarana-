@@ -1,174 +1,242 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transparencia Caja Chica - La jarana</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-      background: #fff;
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-    th {
-      background: #333;
-      color: white;
-    }
-    button {
-      padding: 5px 10px;
-      margin: 5px;
-      cursor: pointer;
-      background: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    img {
-      display: none;
-      max-width: 300px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-    }
-    /* Colores de filas */
-    .ingreso {
-      background-color: #d4edda; /* verde claro */
-    }
-    .egreso {
-      background-color: #f8d7da; /* rojo claro */
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transparencia Caja Chica - La jarana</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #eef2f5;
+            margin: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #0d47a1;
+            font-weight: 300;
+        }
+        .resumen {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 200px;
+        }
+        h3 {
+            margin: 0;
+            font-size: 1em;
+            color: #666;
+        }
+        #saldoActual {
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #1976d2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #1976d2;
+            color: white;
+            font-weight: normal;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        .ingreso {
+            background-color: #e0f2f1;
+        }
+        .egreso {
+            background-color: #ffebee;
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border: 5px solid #fff;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>Transparencia Caja Chica La jarana</h1>
+    <h1>Transparencia Caja Chica La Jarana</h1>
 
-  <table id="tablaCaja">
-    <thead>
-      <tr>
-        <th>Fecha Ingreso</th>
-        <th>Monto Ingreso</th>
-        <th>Fecha Egreso</th>
-        <th>Monto Egreso</th>
-        <th>Comprobante</th>
-        <th>Descripción</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>17/09/2025</td>
-        <td>S/ 75</td>
-        <td>-</td>
-        <td>-</td>
-        <td>
-          <button onclick="toggleImage('img1')">Ver Comprobante</button>
-          <br>
-          <img id="img1" src="https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2075%20soles.jpeg" alt="Comprobante ingreso">
-        </td>
-        <td>sobrante de juanada</td>
-      </tr>
-      <tr>
-        <td>17/09/2025</td>
-        <td>S/ 20</td>
-        <td>-</td>
-        <td>-</td>
-        <td>
-          <button onclick="toggleImage('img2')">Ver Comprobante</button>
-          <br>
-          <img id="img2" src="https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2020%20soles.jpeg" alt="Comprobante ingreso">
-        </td>
-        <td>sobrante de juanada</td>
-      </tr>
-      <tr>
-        <td>-</td>
-        <td>-</td>
-        <td>22/09/2025</td>
-        <td>S/ 11.9</td>
-        <td>
-          <button onclick="toggleImage('img3')">Ver Comprobante</button>
-          <br>
-          <img id="img3" src="https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/22092025%20-11.9.jpeg" alt="Comprobante egreso">
-        </td>
-        <td>envio de zapatillas para Fabrizzio para su clase</td>
-        </tr>
-      <tr>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>
-          <button onclick="toggleImage('img3')">Ver Comprobante</button>
-          <br>
-          <img id="img3" src="https://via.placeholder.com/300" alt="Comprobante egreso">
-        </td>
-        <td>-</td>
-        </tr>
-      <tr>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>
-          <button onclick="toggleImage('img3')">Ver Comprobante</button>
-          <br>
-          <img id="img3" src="https://via.placeholder.com/300" alt="Comprobante egreso">
-        </td>
-        <td>-</td>
-        </tr>
-      <tr>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>
-          <button onclick="toggleImage('img3')">Ver Comprobante</button>
-          <br>
-          <img id="img3" src="https://via.placeholder.com/300" alt="Comprobante egreso">
-        </td>
-        <td>-</td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="resumen">
+        <div class="card">
+            <h3>Total Ingresos</h3>
+            <p id="totalIngresos">S/ 0</p>
+        </div>
+        <div class="card">
+            <h3>Total Egresos</h3>
+            <p id="totalEgresos">S/ 0</p>
+        </div>
+        <div class="card">
+            <h3>Saldo Actual</h3>
+            <p id="saldoActual">S/ 0</p>
+        </div>
+    </div>
 
-  <script>
-    function toggleImage(id) {
-      const img = document.getElementById(id);
-      img.style.display = img.style.display === "block" ? "none" : "block";
-    }
+    <table id="tablaCaja">
+        <thead>
+            <tr>
+                <th>Fecha Ingreso</th>
+                <th>Monto Ingreso</th>
+                <th>Fecha Egreso</th>
+                <th>Monto Egreso</th>
+                <th>Comprobante</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>17/09/2025</td>
+                <td>S/ 75</td>
+                <td>-</td>
+                <td>-</td>
+                <td>
+                    <button onclick="toggleImage('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2075%20soles.jpeg')">Ver Comprobante</button>
+                </td>
+                <td>sobrante de juanada</td>
+            </tr>
+            <tr>
+                <td>17/09/2025</td>
+                <td>S/ 20</td>
+                <td>-</td>
+                <td>-</td>
+                <td>
+                    <button onclick="toggleImage('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2020%20soles.jpeg')">Ver Comprobante</button>
+                </td>
+                <td>sobrante de juanada</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td>-</td>
+                <td>22/09/2025</td>
+                <td>S/ 11.9</td>
+                <td>
+                    <button onclick="toggleImage('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/22092025%20-11.9.jpeg')">Ver Comprobante</button>
+                </td>
+                <td>envio de zapatillas para Fabrizzio para su clase</td>
+            </tr>
+            </tbody>
+    </table>
 
-    // Detectar ingresos y egresos
-    const filas = document.querySelectorAll("#tablaCaja tbody tr");
-    filas.forEach(fila => {
-      const montoIngreso = fila.cells[1].innerText.trim();
-      const montoEgreso = fila.cells[3].innerText.trim();
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
 
-      if (montoIngreso !== "-" && montoIngreso !== "") {
-        fila.classList.add("ingreso");
-      } else if (montoEgreso !== "-" && montoEgreso !== "") {
-        fila.classList.add("egreso");
-      }
-    });
-  </script>
+    <script>
+        // Función para abrir la imagen en un modal
+        function toggleImage(src) {
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("modalImage");
+            modal.style.display = "flex";
+            modalImg.src = src;
+        }
+        
+        // Función para cerrar el modal
+        function closeModal() {
+            const modal = document.getElementById("imageModal");
+            modal.style.display = "none";
+        }
 
+        // Detectar ingresos y egresos y calcular totales
+        const filas = document.querySelectorAll("#tablaCaja tbody tr");
+        const totalIngresosEl = document.getElementById("totalIngresos");
+        const totalEgresosEl = document.getElementById("totalEgresos");
+        const saldoActualEl = document.getElementById("saldoActual");
+
+        let totalIngresos = 0;
+        let totalEgresos = 0;
+
+        filas.forEach(fila => {
+            const montoIngresoTexto = fila.cells[1].innerText.trim();
+            const montoEgresoTexto = fila.cells[3].innerText.trim();
+            
+            if (montoIngresoTexto !== "-" && montoIngresoTexto !== "") {
+                fila.classList.add("ingreso");
+                const monto = parseFloat(montoIngresoTexto.replace('S/', ''));
+                if (!isNaN(monto)) totalIngresos += monto;
+            } else if (montoEgresoTexto !== "-" && montoEgresoTexto !== "") {
+                fila.classList.add("egreso");
+                const monto = parseFloat(montoEgresoTexto.replace('S/', ''));
+                if (!isNaN(monto)) totalEgresos += monto;
+            }
+        });
+
+        const saldoActual = totalIngresos - totalEgresos;
+        totalIngresosEl.innerText = `S/ ${totalIngresos.toFixed(2)}`;
+        totalEgresosEl.innerText = `S/ ${totalEgresos.toFixed(2)}`;
+        saldoActualEl.innerText = `S/ ${saldoActual.toFixed(2)}`;
+
+        // Cambiar color del saldo si es negativo
+        if (saldoActual < 0) {
+            saldoActualEl.style.color = '#d32f2f'; // Rojo oscuro
+        }
+    </script>
 </body>
 </html>
-
-
-
