@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        /* Estilos generales y para PC */
         body {
             font-family: 'Poppins', sans-serif;
             background: #eef2f5;
@@ -162,6 +163,70 @@
         .close:hover {
             color: #bbb;
         }
+
+        /* ----- Media Queries para Responsive Design (Mobile First) ----- */
+        @media (max-width: 768px) {
+            body {
+                margin: 10px;
+            }
+            .resumen {
+                flex-direction: column;
+                align-items: center;
+            }
+            .card {
+                width: 100%;
+                min-width: auto;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            #searchInput {
+                width: 90%;
+            }
+
+            /* Estilos específicos para la tabla en móviles */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: left;
+                white-space: normal;
+                border-bottom: 1px solid #eee;
+            }
+            td:last-child {
+                border-bottom: none;
+            }
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                top: 50%;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                transform: translateY(-50%);
+                font-weight: bold;
+                text-align: right;
+                color: #555;
+            }
+            .ingreso td:before { content: attr(data-label); color: #28a745; }
+            .egreso td:before { content: attr(data-label); color: #dc3545; }
+        }
     </style>
 </head>
 <body>
@@ -204,42 +269,42 @@
         </thead>
         <tbody>
             <tr>
-                <td>17/09/2025</td>
-                <td>S/ 75</td>
-                <td>-</td>
-                <td>-</td>
-                <td>
+                <td data-label="Fecha Ingreso">17/09/2025</td>
+                <td data-label="Monto Ingreso">S/ 75</td>
+                <td data-label="Fecha Egreso">-</td>
+                <td data-label="Monto Egreso">-</td>
+                <td data-label="Comprobante">
                     <button onclick="openModal('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2075%20soles.jpeg')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </td>
-                <td>sobrante de juanada</td>
+                <td data-label="Descripción">sobrante de juanada</td>
             </tr>
             <tr>
-                <td>17/09/2025</td>
-                <td>S/ 20</td>
-                <td>-</td>
-                <td>-</td>
-                <td>
+                <td data-label="Fecha Ingreso">17/09/2025</td>
+                <td data-label="Monto Ingreso">S/ 20</td>
+                <td data-label="Fecha Egreso">-</td>
+                <td data-label="Monto Egreso">-</td>
+                <td data-label="Comprobante">
                     <button onclick="openModal('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2020%20soles.jpeg')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </td>
-                <td>sobrante de juanada</td>
+                <td data-label="Descripción">sobrante de juanada</td>
             </tr>
             <tr>
-                <td>-</td>
-                <td>-</td>
-                <td>22/09/2025</td>
-                <td>S/ 11.9</td>
-                <td>
+                <td data-label="Fecha Ingreso">-</td>
+                <td data-label="Monto Ingreso">-</td>
+                <td data-label="Fecha Egreso">22/09/2025</td>
+                <td data-label="Monto Egreso">S/ 11.9</td>
+                <td data-label="Comprobante">
                     <button onclick="openModal('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/22092025%20-11.9.jpeg')">
                         <i class="fas fa-eye"></i>
                     </button>
                 </td>
-                <td>envio de zapatillas para Fabrizzio para su clase</td>
+                <td data-label="Descripción">envio de zapatillas para Fabrizzio para su clase</td>
             </tr>
-            </tbody>
+        </tbody>
     </table>
 
     <div id="imageModal" class="modal" onclick="closeModal()">
@@ -392,7 +457,6 @@
             });
         });
 
-        // Inicia el renderizado y las animaciones
         calculateAndRender();
 
     </script>
