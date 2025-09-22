@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transparencia Caja Chica - La jarana</title>
+    <title>Transparencia Caja Chica - La Jarana</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: #eef2f5;
             margin: 20px;
             color: #333;
@@ -14,31 +19,67 @@
         h1 {
             text-align: center;
             color: #0d47a1;
-            font-weight: 300;
+            font-weight: 600;
+            margin-bottom: 30px;
         }
         .resumen {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         .card {
             background-color: #fff;
             padding: 20px 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
             min-width: 200px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
         }
         h3 {
             margin: 0;
             font-size: 1em;
             color: #666;
+            font-weight: 400;
+        }
+        #totalIngresos {
+            color: #28a745;
+        }
+        #totalEgresos {
+            color: #dc3545;
         }
         #saldoActual {
-            font-weight: bold;
+            font-weight: 600;
             font-size: 1.5em;
             color: #1976d2;
+        }
+        .chart-container {
+            max-width: 900px;
+            margin: 0 auto 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            width: 300px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         table {
             width: 100%;
@@ -46,7 +87,7 @@
             margin: 20px 0;
             background: #fff;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         th, td {
@@ -57,7 +98,12 @@
         th {
             background: #1976d2;
             color: white;
-            font-weight: normal;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        th:hover {
+            background: #0d47a1;
         }
         tr:nth-child(even) {
             background-color: #f8f9fa;
@@ -82,6 +128,8 @@
         .egreso {
             background-color: #ffebee;
         }
+        .ingreso td:nth-child(2) { color: #28a745; font-weight: 600; }
+        .egreso td:nth-child(4) { color: #dc3545; font-weight: 600; }
         /* Modal */
         .modal {
             display: none;
@@ -91,17 +139,15 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
             background-color: rgba(0, 0, 0, 0.9);
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            margin: auto;
-            display: block;
             max-width: 90%;
             max-height: 90%;
             border: 5px solid #fff;
+            border-radius: 10px;
         }
         .close {
             position: absolute;
@@ -113,10 +159,8 @@
             transition: 0.3s;
             cursor: pointer;
         }
-        .close:hover,
-        .close:focus {
+        .close:hover {
             color: #bbb;
-            text-decoration: none;
         }
     </style>
 </head>
@@ -138,16 +182,24 @@
             <p id="saldoActual">S/ 0</p>
         </div>
     </div>
+    
+    <div class="chart-container">
+        <canvas id="balanceChart"></canvas>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="Buscar por descripción...">
+    </div>
 
     <table id="tablaCaja">
         <thead>
             <tr>
-                <th>Fecha Ingreso</th>
-                <th>Monto Ingreso</th>
-                <th>Fecha Egreso</th>
-                <th>Monto Egreso</th>
+                <th onclick="sortTable(0)">Fecha Ingreso</th>
+                <th onclick="sortTable(1)">Monto Ingreso</th>
+                <th onclick="sortTable(2)">Fecha Egreso</th>
+                <th onclick="sortTable(3)">Monto Egreso</th>
                 <th>Comprobante</th>
-                <th>Descripción</th>
+                <th onclick="sortTable(5)">Descripción</th>
             </tr>
         </thead>
         <tbody>
@@ -157,7 +209,9 @@
                 <td>-</td>
                 <td>-</td>
                 <td>
-                    <button onclick="toggleImage('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2075%20soles.jpeg')">Ver Comprobante</button>
+                    <button onclick="openModal('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2075%20soles.jpeg')">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </td>
                 <td>sobrante de juanada</td>
             </tr>
@@ -167,7 +221,9 @@
                 <td>-</td>
                 <td>-</td>
                 <td>
-                    <button onclick="toggleImage('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2020%20soles.jpeg')">Ver Comprobante</button>
+                    <button onclick="openModal('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/17092025%2020%20soles.jpeg')">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </td>
                 <td>sobrante de juanada</td>
             </tr>
@@ -177,7 +233,9 @@
                 <td>22/09/2025</td>
                 <td>S/ 11.9</td>
                 <td>
-                    <button onclick="toggleImage('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/22092025%20-11.9.jpeg')">Ver Comprobante</button>
+                    <button onclick="openModal('https://raw.githubusercontent.com/josue01001100/portal-de-transparencia-financiera-de-la-jarana-/main/22092025%20-11.9.jpeg')">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </td>
                 <td>envio de zapatillas para Fabrizzio para su clase</td>
             </tr>
@@ -185,58 +243,158 @@
     </table>
 
     <div id="imageModal" class="modal" onclick="closeModal()">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <span class="close">&times;</span>
         <img class="modal-content" id="modalImage">
     </div>
 
     <script>
-        // Función para abrir la imagen en un modal
-        function toggleImage(src) {
+        const table = document.getElementById("tablaCaja");
+        let sortDirection = {};
+
+        function openModal(src) {
             const modal = document.getElementById("imageModal");
             const modalImg = document.getElementById("modalImage");
             modal.style.display = "flex";
             modalImg.src = src;
         }
         
-        // Función para cerrar el modal
         function closeModal() {
             const modal = document.getElementById("imageModal");
             modal.style.display = "none";
         }
+        document.querySelector('.close').onclick = closeModal;
 
-        // Detectar ingresos y egresos y calcular totales
-        const filas = document.querySelectorAll("#tablaCaja tbody tr");
-        const totalIngresosEl = document.getElementById("totalIngresos");
-        const totalEgresosEl = document.getElementById("totalEgresos");
-        const saldoActualEl = document.getElementById("saldoActual");
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerText = `S/ ${(progress * (end - start) + start).toFixed(2)}`;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
 
-        let totalIngresos = 0;
-        let totalEgresos = 0;
-
-        filas.forEach(fila => {
-            const montoIngresoTexto = fila.cells[1].innerText.trim();
-            const montoEgresoTexto = fila.cells[3].innerText.trim();
+        function calculateAndRender() {
+            const filas = document.querySelectorAll("#tablaCaja tbody tr");
+            const totalIngresosEl = document.getElementById("totalIngresos");
+            const totalEgresosEl = document.getElementById("totalEgresos");
+            const saldoActualEl = document.getElementById("saldoActual");
+            const ctx = document.getElementById('balanceChart').getContext('2d');
             
-            if (montoIngresoTexto !== "-" && montoIngresoTexto !== "") {
-                fila.classList.add("ingreso");
-                const monto = parseFloat(montoIngresoTexto.replace('S/', ''));
-                if (!isNaN(monto)) totalIngresos += monto;
-            } else if (montoEgresoTexto !== "-" && montoEgresoTexto !== "") {
-                fila.classList.add("egreso");
-                const monto = parseFloat(montoEgresoTexto.replace('S/', ''));
-                if (!isNaN(monto)) totalEgresos += monto;
+            let totalIngresos = 0;
+            let totalEgresos = 0;
+            let balanceData = [];
+            let dates = [];
+            let currentBalance = 0;
+
+            filas.forEach(fila => {
+                const montoIngresoTexto = fila.cells[1].innerText.trim();
+                const montoEgresoTexto = fila.cells[3].innerText.trim();
+                
+                if (montoIngresoTexto !== "-" && montoIngresoTexto !== "") {
+                    fila.classList.add("ingreso");
+                    const monto = parseFloat(montoIngresoTexto.replace('S/', ''));
+                    if (!isNaN(monto)) totalIngresos += monto;
+                } else if (montoEgresoTexto !== "-" && montoEgresoTexto !== "") {
+                    fila.classList.add("egreso");
+                    const monto = parseFloat(montoEgresoTexto.replace('S/', ''));
+                    if (!isNaN(monto)) totalEgresos += monto;
+                }
+
+                const fecha = fila.cells[0].innerText.trim() !== "-" ? fila.cells[0].innerText.trim() : fila.cells[2].innerText.trim();
+                
+                if (montoIngresoTexto !== "-" && montoIngresoTexto !== "") {
+                    currentBalance += parseFloat(montoIngresoTexto.replace('S/', ''));
+                } else if (montoEgresoTexto !== "-" && montoEgresoTexto !== "") {
+                    currentBalance -= parseFloat(montoEgresoTexto.replace('S/', ''));
+                }
+                balanceData.push(currentBalance);
+                dates.push(fecha);
+            });
+
+            animateValue(totalIngresosEl, 0, totalIngresos, 1000);
+            animateValue(totalEgresosEl, 0, totalEgresos, 1000);
+            animateValue(saldoActualEl, 0, totalIngresos - totalEgresos, 1000);
+
+            if ((totalIngresos - totalEgresos) < 0) {
+                saldoActualEl.style.color = '#d32f2f';
+            } else {
+                saldoActualEl.style.color = '#1976d2';
             }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Saldo Acumulado (S/)',
+                        data: balanceData,
+                        borderColor: '#1976d2',
+                        tension: 0.4,
+                        fill: false,
+                        pointBackgroundColor: '#1976d2',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#1976d2',
+                        pointHoverBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+        function sortTable(n) {
+            const tbody = table.querySelector("tbody");
+            let rows = Array.from(tbody.rows);
+            const isNumeric = [1, 3].includes(n);
+            let dir = sortDirection[n] === "asc" ? "desc" : "asc";
+            
+            rows.sort((rowA, rowB) => {
+                let cellA = rowA.cells[n].innerText.replace('S/', '').trim();
+                let cellB = rowB.cells[n].innerText.replace('S/', '').trim();
+                
+                if (isNumeric) {
+                    cellA = parseFloat(cellA) || 0;
+                    cellB = parseFloat(cellB) || 0;
+                }
+                
+                if (dir === "asc") {
+                    return cellA > cellB ? 1 : -1;
+                } else {
+                    return cellA < cellB ? 1 : -1;
+                }
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+            sortDirection[n] = dir;
+        }
+
+        document.getElementById("searchInput").addEventListener("keyup", function() {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#tablaCaja tbody tr");
+            rows.forEach(row => {
+                const description = row.cells[5].innerText.toLowerCase();
+                if (description.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
         });
 
-        const saldoActual = totalIngresos - totalEgresos;
-        totalIngresosEl.innerText = `S/ ${totalIngresos.toFixed(2)}`;
-        totalEgresosEl.innerText = `S/ ${totalEgresos.toFixed(2)}`;
-        saldoActualEl.innerText = `S/ ${saldoActual.toFixed(2)}`;
+        // Inicia el renderizado y las animaciones
+        calculateAndRender();
 
-        // Cambiar color del saldo si es negativo
-        if (saldoActual < 0) {
-            saldoActualEl.style.color = '#d32f2f'; // Rojo oscuro
-        }
     </script>
 </body>
 </html>
